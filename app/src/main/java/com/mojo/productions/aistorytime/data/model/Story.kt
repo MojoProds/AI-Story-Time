@@ -1,4 +1,4 @@
-package com.mojo.productions.aistorytime.model
+package com.mojo.productions.aistorytime.data.model
 
 data class Story(
   val paragraphs: List<Paragraph> = emptyList(),

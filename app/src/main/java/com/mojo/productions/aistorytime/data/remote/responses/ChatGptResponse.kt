@@ -1,9 +1,0 @@
-package com.mojo.productions.aistorytime.data.remote.responses
-
-data class ChatGptResponse(
-  val choices: List<Choice>,
-  val created: Int,
-  val id: String,
-  val `object`: String,
-  val usage: Usage,
-)

@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.mojo.productions.aistorytime.ui.promptinput.PromptInputScreen
+import com.mojo.productions.aistorytime.ui.storypage.StoryPageScreen
 import com.mojo.productions.aistorytime.ui.theme.AIStoryTimeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -25,19 +26,20 @@ class MainActivity : ComponentActivity() {
           startDestination = "prompt"
         ) {
           composable("prompt") {
-            PromptInputScreen(onNavigateToStory = { navController.navigate("story/hello") })
+            PromptInputScreen(navController = navController)
           }
           composable(
-            "story/{content}",
+            "story/{prompt}",
             arguments = listOf(
-              navArgument("content") {
+              navArgument("prompt") {
                 type = NavType.StringType
               }
             )
           ) {
-            val content = remember {
-              it.arguments?.getString("content")
+            val prompt = remember {
+              it.arguments?.getString("prompt")
             }
+            StoryPageScreen(prompt = prompt!!)
           }
         }
       }

@@ -20,10 +20,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PromptInputScreen(onNavigateToStory: () -> Unit, modifier: Modifier = Modifier) {
+fun PromptInputScreen(navController: NavController) {
+  fun navigateToStory(prompt: String) {
+    if (prompt.isNotEmpty()) {
+      navController.navigate("story/${prompt}")
+    }
+  }
+
   Surface(
     color = MaterialTheme.colorScheme.background,
     modifier = Modifier.fillMaxSize()
@@ -34,7 +41,7 @@ fun PromptInputScreen(onNavigateToStory: () -> Unit, modifier: Modifier = Modifi
     ) {
       Text(
         text = "Tell me a story about",
-        modifier = modifier.padding(10.dp)
+        modifier = Modifier.padding(10.dp)
       )
       val promptText = remember {
         mutableStateOf(TextFieldValue())
@@ -42,13 +49,14 @@ fun PromptInputScreen(onNavigateToStory: () -> Unit, modifier: Modifier = Modifi
       TextField(
         value = promptText.value,
         onValueChange = { input -> promptText.value = input },
-        modifier = modifier.padding(10.dp),
+        modifier = Modifier.padding(10.dp),
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Go),
-        keyboardActions = KeyboardActions(onGo = { onNavigateToStory.invoke() })
+        keyboardActions = KeyboardActions(onGo = { navigateToStory(promptText.value.text) })
       )
       Button(
-        onClick = onNavigateToStory,
-        modifier = modifier.padding(10.dp)
+        onClick = { navigateToStory(promptText.value.text) },
+        modifier = Modifier.padding(10.dp),
+        enabled = promptText.value.text != ""
       ) {
         Text(text = "Generate")
       }
