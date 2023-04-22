@@ -11,3 +11,24 @@ data class ChatGptResponse(
   val usage: Usage,
   val choices: List<Choice>,
 )
+
+data class Choice(
+  val message: Message,
+  @SerializedName("finish_reason")
+  val finishReason: String,
+  val index: Long,
+)
+
+data class Message(
+  val role: String,
+  val content: String,
+)
+
+data class Usage(
+  @SerializedName("prompt_tokens")
+  val promptTokens: Long,
+  @SerializedName("completion_tokens")
+  val completionTokens: Long,
+  @SerializedName("total_tokens")
+  val totalTokens: Long,
+)

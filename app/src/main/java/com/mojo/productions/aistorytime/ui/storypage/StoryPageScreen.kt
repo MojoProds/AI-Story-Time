@@ -1,5 +1,7 @@
 package com.mojo.productions.aistorytime.ui.storypage
 
+import android.media.AudioAttributes
+import android.media.MediaPlayer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -44,13 +46,14 @@ fun StoryPageScreen(
         Text(text = loadError)
       }
     }
-    StoryDisplay(story = story)
+    StoryDisplay(story, viewModel)
   }
 }
 
 @Composable
 fun StoryDisplay(
   story: Story?,
+  viewModel: StoryPageViewModel
 ) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -62,6 +65,27 @@ fun StoryDisplay(
           text = paragraph.content,
           modifier = Modifier.padding(20.dp)
         )
+      }
+
+      LaunchedEffect(Unit) {
+        viewModel.loadVoiceOver(story.paragraphs[0].content)
+      }
+
+      val voiceOverFile by remember { viewModel.voiceOverFile }
+
+      val mediaPlayer = MediaPlayer()
+      mediaPlayer.setAudioAttributes(
+        AudioAttributes.Builder()
+          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .build()
+      )
+
+      if(voiceOverFile != null) {
+        mediaPlayer.setDataSource(voiceOverFile)
+        mediaPlayer.prepareAsync()
+        mediaPlayer.setOnPreparedListener {
+          mediaPlayer.start()
+        }
       }
     }
   }
