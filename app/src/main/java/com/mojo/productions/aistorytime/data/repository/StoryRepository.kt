@@ -89,8 +89,7 @@ class StoryRepository @Inject constructor(
 
   private fun writeResponseBodyToCache(body: ResponseBody): File? {
     try {
-      val audioFile =
-        File(appContext.cacheDir.path + File.separator + "tempAudio.mp3")
+      val audioFile = File(appContext.cacheDir, "tempAudio.mp3")
       var inputStream: InputStream? = null
       var outputStream: OutputStream? = null
       try {

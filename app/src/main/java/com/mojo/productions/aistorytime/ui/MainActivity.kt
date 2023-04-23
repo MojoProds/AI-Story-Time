@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
           startDestination = "prompt"
         ) {
           composable("prompt") {
-            PromptInputScreen(navController = navController)
+            PromptInputScreen(navController)
           }
           composable(
             "story/{prompt}",
@@ -39,7 +39,7 @@ class MainActivity : ComponentActivity() {
             val prompt = remember {
               it.arguments?.getString("prompt")
             }
-            StoryPageScreen(prompt = prompt!!)
+            StoryPageScreen(prompt!!, navController)
           }
         }
       }

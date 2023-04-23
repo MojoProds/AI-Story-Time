@@ -8,8 +8,7 @@ import com.mojo.productions.aistorytime.data.model.Story
 import com.mojo.productions.aistorytime.data.repository.StoryRepository
 import com.mojo.productions.aistorytime.util.LoadResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.FileDescriptor
-import java.io.FileInputStream
+import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,7 +22,7 @@ class StoryPageViewModel @Inject constructor(
   var loadError = mutableStateOf("")
   var isLoading = mutableStateOf(false)
 
-  var voiceOverFile = mutableStateOf<FileDescriptor?>(null)
+  var voiceOverFile = mutableStateOf<File?>(null)
 
   fun loadStory(prompt: String) {
     viewModelScope.launch {
@@ -50,8 +49,7 @@ class StoryPageViewModel @Inject constructor(
     viewModelScope.launch(Dispatchers.IO) {
       when (val result = repository.getVoiceOver(content)) {
         is LoadResult.Success -> {
-          val fileInputStream = FileInputStream(result.data)
-          voiceOverFile.value = fileInputStream.fd
+          voiceOverFile.value = result.data
         }
 
         is LoadResult.Error -> {
@@ -59,5 +57,9 @@ class StoryPageViewModel @Inject constructor(
         }
       }
     }
+  }
+
+  fun clearVoiceOver() {
+    voiceOverFile.value = null
   }
 }
