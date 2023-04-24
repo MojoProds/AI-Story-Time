@@ -7,7 +7,9 @@ import com.mojo.productions.aistorytime.data.remote.ElevenLabsApi
 import com.mojo.productions.aistorytime.data.remote.OpenAiApi
 import com.mojo.productions.aistorytime.data.remote.models.ChatGptRequest
 import com.mojo.productions.aistorytime.data.remote.models.ChatGptResponse
+import com.mojo.productions.aistorytime.data.remote.models.ImageRequest
 import com.mojo.productions.aistorytime.data.remote.models.Message
+import com.mojo.productions.aistorytime.data.remote.models.Size
 import com.mojo.productions.aistorytime.data.remote.models.TextToSpeechRequest
 import com.mojo.productions.aistorytime.data.remote.models.VoiceSettings
 import com.mojo.productions.aistorytime.util.LoadResult
@@ -30,6 +32,10 @@ const val SPEECH_VOICE_ID_BELLA = "EXAVITQu4vr4xnSDxMaL"
 const val SPEECH_STABILITY = 0.3f
 const val SPEECH_BOOST = 0.75f
 
+const val IMAGE_PROMPT_PREFIX = "Illustrate in the style of children's books. "
+const val IMAGE_COUNT = 1
+
+
 @ActivityScoped
 class StoryRepository @Inject constructor(
   private val appContext: Context,
@@ -41,7 +47,7 @@ class StoryRepository @Inject constructor(
     val response = try {
       createStory(openAiApi.getChatGptResponse(createChatGptRequest(prompt)))
     } catch (e: Exception) {
-      return LoadResult.Error("An unknown error occurred.")
+      return LoadResult.Error("$e")
     }
     return LoadResult.Success(response)
   }
@@ -62,6 +68,15 @@ class StoryRepository @Inject constructor(
     return if (response == null) LoadResult.Error("File error occurred.") else LoadResult.Success(
       response
     )
+  }
+
+  suspend fun getImage(content: String): LoadResult<String> {
+    val response = try {
+      openAiApi.getImageResponse(createImageRequest(content)).data[0].url
+    } catch (e: Exception) {
+      return LoadResult.Error("$e")
+    }
+    return LoadResult.Success(response)
   }
 
   private fun createChatGptRequest(prompt: String): ChatGptRequest {
@@ -117,5 +132,13 @@ class StoryRepository @Inject constructor(
     } catch (e: IOException) {
       return null
     }
+  }
+
+  private fun createImageRequest(content: String): ImageRequest {
+    return ImageRequest(
+      IMAGE_PROMPT_PREFIX + content,
+      IMAGE_COUNT,
+      Size.SIZE_256.size
+    )
   }
 }

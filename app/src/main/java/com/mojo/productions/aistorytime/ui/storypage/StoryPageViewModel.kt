@@ -24,6 +24,9 @@ class StoryPageViewModel @Inject constructor(
 
   var voiceOverFile = mutableStateOf<File?>(null)
 
+  var imageUrl = mutableStateOf<String?>(null)
+  var imageIsLoading = mutableStateOf(false)
+
   fun loadStory(prompt: String) {
     story.value = null
     viewModelScope.launch {
@@ -56,6 +59,24 @@ class StoryPageViewModel @Inject constructor(
 
         is LoadResult.Error -> {
           Log.e(this.javaClass.simpleName, "Load voice over failed: ${result.message}")
+        }
+      }
+    }
+  }
+
+  fun loadImage(content: String) {
+    imageUrl.value = null
+    viewModelScope.launch {
+      imageIsLoading.value = true
+      when (val result = repository.getImage(content)) {
+        is LoadResult.Success -> {
+          imageUrl.value = result.data
+          imageIsLoading.value = false
+        }
+
+        is LoadResult.Error -> {
+          Log.e(this.javaClass.simpleName, "Load image failed: ${result.message}")
+          imageIsLoading.value = false
         }
       }
     }
