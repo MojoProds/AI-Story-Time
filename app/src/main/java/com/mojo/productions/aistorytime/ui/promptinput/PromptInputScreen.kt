@@ -17,9 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +45,8 @@ fun PromptInputScreen(navController: NavController) {
     ) {
       Text(
         text = "Tell me a story about",
-        modifier = Modifier.padding(10.dp)
+        modifier = Modifier.padding(10.dp),
+        style = TextStyle(fontSize = 35.sp, fontWeight = FontWeight.Bold)
       )
       val promptText = remember {
         mutableStateOf(TextFieldValue())
@@ -50,6 +55,7 @@ fun PromptInputScreen(navController: NavController) {
         value = promptText.value,
         onValueChange = { input -> promptText.value = input },
         modifier = Modifier.padding(10.dp),
+        textStyle = TextStyle(fontSize = 30.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center),
         keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Go),
         keyboardActions = KeyboardActions(onGo = { navigateToStory(promptText.value.text) })
       )

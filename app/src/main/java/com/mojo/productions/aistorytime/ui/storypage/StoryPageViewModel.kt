@@ -25,6 +25,7 @@ class StoryPageViewModel @Inject constructor(
   var voiceOverFile = mutableStateOf<File?>(null)
 
   fun loadStory(prompt: String) {
+    story.value = null
     viewModelScope.launch {
       isLoading.value = true
 
@@ -46,6 +47,7 @@ class StoryPageViewModel @Inject constructor(
   }
 
   fun loadVoiceOver(content: String) {
+    voiceOverFile.value = null
     viewModelScope.launch(Dispatchers.IO) {
       when (val result = repository.getVoiceOver(content)) {
         is LoadResult.Success -> {
@@ -57,9 +59,5 @@ class StoryPageViewModel @Inject constructor(
         }
       }
     }
-  }
-
-  fun clearVoiceOver() {
-    voiceOverFile.value = null
   }
 }

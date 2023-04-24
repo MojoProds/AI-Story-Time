@@ -6,8 +6,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -20,11 +25,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.mojo.productions.aistorytime.data.model.Paragraph
+import java.io.File
 
 @Composable
 fun StoryPageScreen(
@@ -32,7 +42,7 @@ fun StoryPageScreen(
   navController: NavController,
   viewModel: StoryPageViewModel = hiltViewModel(),
 ) {
-  LaunchedEffect(Unit) {
+  LaunchedEffect(prompt) {
     viewModel.loadStory(prompt)
   }
 
@@ -54,9 +64,15 @@ fun StoryPageScreen(
     }
     if (story != null) {
       val currentParagraph = remember { mutableStateOf(0) }
+      val voiceOverFile by remember { viewModel.voiceOverFile }
+
+      LaunchedEffect(currentParagraph.value) {
+        viewModel.loadVoiceOver(story!!.paragraphs[currentParagraph.value].content)
+      }
+
       ParagraphDisplay(
         story!!.paragraphs[currentParagraph.value],
-        viewModel
+        voiceOverFile
       ) {
         if (currentParagraph.value < story!!.paragraphs.size - 1) {
           currentParagraph.value++
@@ -73,7 +89,7 @@ fun StoryPageScreen(
 @Composable
 fun ParagraphDisplay(
   paragraph: Paragraph,
-  viewModel: StoryPageViewModel,
+  voiceOverFile: File?,
   onNextPageListener: () -> Unit,
 ) {
   Column(
@@ -82,27 +98,25 @@ fun ParagraphDisplay(
   ) {
     Text(
       text = paragraph.content,
-      modifier = Modifier.padding(20.dp)
+      modifier = Modifier.padding(20.dp),
+      style = TextStyle(
+        fontSize = 20.sp,
+        fontWeight = FontWeight.SemiBold
+      ),
     )
 
-    LaunchedEffect(paragraph.content) {
-      viewModel.loadVoiceOver(paragraph.content)
-    }
-
     val context = LocalContext.current
-    val voiceOverFile by remember { viewModel.voiceOverFile }
     val voiceOverFinished = remember { mutableStateOf(false) }
 
     DisposableEffect(voiceOverFile) {
       val mediaPlayer = MediaPlayer()
       if (voiceOverFile != null) {
-        mediaPlayer.setDataSource(context, voiceOverFile!!.toUri())
+        mediaPlayer.setDataSource(context, voiceOverFile.toUri())
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
           mediaPlayer.start()
         }
         mediaPlayer.setOnCompletionListener {
-          viewModel.clearVoiceOver()
           voiceOverFinished.value = true
         }
       }
@@ -112,15 +126,15 @@ fun ParagraphDisplay(
       }
     }
 
-    if (voiceOverFinished.value) {
-      FloatingActionButton(onClick = {
+    Button(
+      onClick = {
         onNextPageListener.invoke()
         voiceOverFinished.value = false
-      }) {
-        Text(
-          text = "Next"
-        )
-      }
+      },
+      shape = CircleShape,
+      enabled = voiceOverFinished.value
+    ) {
+      Icon(Icons.Filled.ArrowForward, "Next")
     }
   }
 }
