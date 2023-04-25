@@ -52,7 +52,7 @@ class StoryRepository @Inject constructor(
     return LoadResult.Success(response)
   }
 
-  suspend fun getVoiceOver(content: String): LoadResult<File> {
+  suspend fun getVoiceOver(content: String, fileName: String): LoadResult<File> {
     val response = try {
       writeResponseBodyToCache(
         elevenLabsApi.getTextToSpeechResponse(
@@ -60,14 +60,13 @@ class StoryRepository @Inject constructor(
           createTextToSpeechRequest(
             content
           )
-        )
+        ),
+        fileName
       )
     } catch (e: Exception) {
       return LoadResult.Error("$e")
     }
-    return if (response == null) LoadResult.Error("File error occurred.") else LoadResult.Success(
-      response
-    )
+    return LoadResult.Success(response)
   }
 
   suspend fun getImage(content: String): LoadResult<String> {
@@ -93,7 +92,7 @@ class StoryRepository @Inject constructor(
     return Story(
       response.choices[0].message.content
         .split("\n\n")
-        .map { paragraph -> Paragraph(paragraph, "", "") })
+        .map { paragraphContent -> Paragraph(paragraphContent) })
   }
 
   private fun createTextToSpeechRequest(content: String): TextToSpeechRequest {
@@ -102,9 +101,9 @@ class StoryRepository @Inject constructor(
     )
   }
 
-  private fun writeResponseBodyToCache(body: ResponseBody): File? {
+  private fun writeResponseBodyToCache(body: ResponseBody, fileName: String): File {
     try {
-      val audioFile = File(appContext.cacheDir, "tempAudio.mp3")
+      val audioFile = File(appContext.cacheDir, fileName)
       var inputStream: InputStream? = null
       var outputStream: OutputStream? = null
       try {
@@ -123,14 +122,14 @@ class StoryRepository @Inject constructor(
         outputStream.flush()
         return audioFile
       } catch (e: IOException) {
-        return null
+        throw e
       } finally {
         inputStream?.close()
         outputStream?.close()
         body.close()
       }
     } catch (e: IOException) {
-      return null
+      throw e
     }
   }
 

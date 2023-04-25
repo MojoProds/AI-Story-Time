@@ -69,15 +69,15 @@ fun StoryPageScreen(
         Text(text = loadError)
       }
     }
-    if (story != null) {
+    if (story != null && !isLoading) {
       val currentParagraph = remember { mutableStateOf(0) }
       val voiceOverFile by remember { viewModel.voiceOverFile }
       val imageUrl by remember { viewModel.imageUrl }
       val imageIsLoading by remember { viewModel.imageIsLoading }
 
       LaunchedEffect(currentParagraph.value) {
-        viewModel.loadVoiceOver(story!!.paragraphs[currentParagraph.value].content)
-        viewModel.loadImage(story!!.paragraphs[currentParagraph.value].content)
+        viewModel.loadVoiceOver(currentParagraph.value)
+        viewModel.loadImage(currentParagraph.value)
       }
 
       ParagraphDisplay(
@@ -167,6 +167,7 @@ fun ParagraphDisplay(
         onNextPageListener.invoke()
         voiceOverFinished.value = false
       },
+      modifier = Modifier.padding(20.dp),
       shape = CircleShape,
       enabled = voiceOverFinished.value
     ) {
