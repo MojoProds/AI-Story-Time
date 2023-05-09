@@ -9,7 +9,7 @@ AI Story Time is a an app that generates and narrates stories for children. It i
 
 ## Upcoming features
 
-* Do a pass with ChatGPT on the story to generate image prompts for each paragraph
+* Proprocess story with ChatGPT to generate image prompts for each paragraph
 * Add the ability to save generated stories to disk
 * Add the ability to continue a story once it's finished
 
