@@ -1,5 +1,7 @@
 # AI-Story-Time
-AI Story Time is a an app that generates and narrates stories for children. It is built using Kotlin, Jetpack Compose, and Retrofit, leveraging ChatGPT, DALL-E, and Eleven Labs APIs.
+AI Story Time is a an app that generates and narrates stories for children. 
+
+Built using Kotlin, Jetpack Compose, and Retrofit, leveraging ChatGPT, DALL-E, and Eleven Labs APIs.
 
 ## Demos
 
